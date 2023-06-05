@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--接口的地址com开始到接口名UserMapper-->
+<mapper namespace="com.qwh.mybatis.mapper.EmpMapper">
+
+    <!--sql语句-->
+<!--    (1)-->
+<!--        List<Emp> getAllEmp();-->
+    <select id="getAllEmpOne" resultType="Emp">
+        select * from t_emp<!--Emp{eid=5, empName='null', age=123, sex='女', email='asd.com', dept=null}-->
+    </select>
+<!--    (2)-->
+    <select id="getAllEmpTwe" resultType="Emp">
+        select eid,emp_name empName,age,sex,email from t_emp<!--Emp{eid=5, empName='heihei', age=123, sex='女', email='asd.com', dept=null}-->
+    </select>
+<!--    (3)-->
+    <select id="getAllEmpThree" resultType="Emp">
+        select * from t_emp<!--Emp{eid=5, empName='heihei', age=123, sex='女', email='asd.com', dept=null}-->
+    </select>
+<!--    (4)-->
+    <resultMap id="AllEmp" type="Emp">
+<!--        设置主键映射-->
+        <id property="eid" column="eid"></id>
+<!--    <result property="java类的属性" column="mysql表的字段"></result>    -->
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+    </resultMap>
+    <select id="getAllEmp" resultMap="AllEmp">
+        select * from t_emp<!--Emp{eid=5, empName='heihei', age=123, sex='女', email='asd.com', dept=null}-->
+    </select>
+<!--           Emp getEmpAndDept(Integer eid);-->
+    <resultMap id="EmpAndDeptOne" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <result property="dept.did" column="did"></result>
+        <result property="dept.deptName" column="dept_name"></result>
+    </resultMap>
+    <resultMap id="EmpAndDept" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <association property="dept" javaType="Dept">
+            <id property="did" column="did"></id>
+            <result property="deptName" column="dept_name"></result>
+        </association>
+    </resultMap>
+
+    <select id="getEmpAndDept" resultMap="EmpAndDept">
+        select * from t_emp left join t_dept on t_emp.did = t_dept .did where t_emp.eid = #{eid}
+    </select>
+<!--        Emp getEmpAndDeptByStep(getEmpAndEmpByStep(@Param("eid") Integer eid);-->
+    <resultMap id="EmpAndDeptByStep" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+       select:设置分步查询的sql的唯一标识（namespace.SQLId或mapper接口的全类名.方法名）
+       column:设置分布查询的条件
+       fetchType:当开启了全局的延迟加载之后，可通过此属性手动控制延迟加载的效果
+       fetchType="lazy|eager":lazy表示延迟加载，eager表示立即加载
+   -->
+        <association property="dept"
+                     select="com.qwh.mybatis.mapper.DeptMapper.getEmpDeptByStepTwe"
+                     column="did"
+                     fetchType="eager"></association>
+    </resultMap>
+    <select id="getEmpAndDeptByStep" resultMap="EmpAndDeptByStep">
+        select * from t_emp where eid = #{eid}
+    </select>
+
+
+<!--     List<Emp> getDeptAndEmpBySept(@Param("did") Integer did);-->
+    <select id="getDeptAndEmpByStep" resultType="Emp">
+        select * from t_emp where eid = #{eid}
+    </select>
+<!--***************************************************************-->
+<!--    Emp DeptAndEmpStepTwe(@Param("eid") Integer eid);-->
+    <select id="DeptAndEmpStepTwe" resultType="Emp">
+        select * from t_emp where did = #{did}
+    </select>
+</mapper>

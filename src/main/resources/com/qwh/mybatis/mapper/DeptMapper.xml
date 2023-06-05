@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--接口的地址com开始到接口名UserMapper-->
+<mapper namespace="com.qwh.mybatis.mapper.DeptMapper">
+
+    <!--sql语句-->
+<!--        Dept getDeptAndEmpByStep(@Param("did") Integer did);-->
+    <resultMap id="DeptANDeptByStep" type="Dept">
+        <id property="did" column="did"></id>
+        <result property="deptName" column="dept_name"></result>
+        <!--
+            collection：处理一对多的映射关系
+            ofType：表示该属性所对应的集合中存储数据的类型
+        -->
+        <collection property="emps" ofType="Emp">
+            <id property="eid" column="eid"></id>
+            <result property="empName" column="emp_name"></result>
+            <result property="age" column="age"></result>
+            <result property="sex" column="sex"></result>
+            <result property="email" column="email"></result>
+        </collection>
+    </resultMap>
+    <select id="getDeptAndEmpByStep" resultMap="DeptANDeptByStep">
+        select * from t_dept left join t_emp on t_dept.did = t_emp.did where t_dept.did = #{did}
+    </select>
+<!--***************************************************************************************************-->
+
+
+<!--    Dept getEmpAndDeptByStepTwe(@Param("eid") Integer eid);-->
+    <select id="getEmpDeptByStepTwe" resultType="Dept">
+        select * from t_dept where did = #{did}
+    </select>
+
+
+<!--    ****************************************************************************-->
+    <resultMap id="DeptAndEmpMap" type="Dept">
+        <id property="did" column="did"></id>
+        <result property="deptName" column="dept_name"></result>
+<!--        一对多-->
+        <collection property="emps" column="Emp">
+            <id property="eid" column="eid"></id>
+            <result property="empName" column="emp_name"></result>
+            <result property="age" column="age"></result>
+            <result property="sex" column="sex"></result>
+            <result property="email" column="email"></result>
+        </collection>
+    </resultMap>
+<!--        Dept getEmpAndDept(@Param("eid") Integer eid);-->
+    <select id="getDeptAndEmp" resultMap="DeptAndEmpMap">
+        select * from t_dept left join t_emp on t_dept.did = t_emp.did where t_dept.did = #{did}
+    </select>
+
+
+<!--    **********************************************************-->
+    <resultMap id="DeptAndEmpStepOneResultMap" type="Dept">
+        <id property="did" column="did"></id>
+        <result property="empName" column="emp_name"></result>
+        <collection property="emps"
+                    select="com.qwh.mybatis.mapper.EmpMapper.DeptAndEmpStepTwe"
+                    column="did"
+                    fetchType="eager"></collection>
+    </resultMap>
+<!--    Dept DeptAndEmpStepOne(@Param("did") Integer did);-->
+    <select id="DeptAndEmpStepOne" resultMap="DeptAndEmpStepOneResultMap">
+        select * from t_dept where did = #{did}
+    </select>
+
+
+</mapper>
